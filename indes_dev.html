@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIBRANT</title>
+    <meta name="description" content="Générateur de palettes de couleurs personnalisées à partir de votre couleur dominante. Projet étudiant ENISo">
+    <link rel="stylesheet" href="style_dev.css">
+    <!--<style>
+        /* Animation de surbrillance pour les sections cibles */
+        @keyframes pulseHighlight {
+            0% {
+                box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(78, 205, 196, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
+            }
+        }
+        
+        .highlighted {
+            position: relative;
+            animation: pulseHighlight 1.5s ease-in-out;
+        }
+        
+        /* Style pour les liens de défilement */
+        .scroll-link {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-link:hover {
+            color: var(--primary, #4ECDC4);
+            transform: translateY(-2px);
+        }
+    </style>-->
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="head">
+                <div class="debut-header">
+                    <img src="expl2.jpg" alt="Logo VIBRANT" class="logo-img">
+                </div>
+                <div class="logo-content">
+                    <h2><strong>🎨VIBRANT</strong></h2>
+                    <h3 class="subtitle">💫 Votre Palette Votre Signature</h3>
+                </div>
+            </div>
+            <nav class="menu">
+                <a href="index.html" class="active">🏠 Accueil</a>
+                <a href="guide.html">📚 Guide</a>
+                <a href="#color-selector" class="scroll-link">👔 Testeur</a>
+                <a href="#contact-footer" class="scroll-link">📞 Contact</a>
+                <button class="btn-signin" onclick="openLoginModal()">🔐 Sign In</button>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Modal de connexion -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLoginModal()" aria-label="Fermer">&times;</span>            
+            <h2>🔐 Connexion</h2>
+            <p>Connectez-vous pour sauvegarder vos palettes préférées</p>
+            
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">📧 Email :</label>
+                    <input type="email" id="loginEmail" required placeholder="votre@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">🔑 Mot de passe :</label>
+                    <input type="password" id="loginPassword" required placeholder="Votre mot de passe">
+                </div>
+                
+                <button type="submit" class="btn-submit">Se connecter</button>
+            </form>
+            
+            <p class="modal-footer">
+                Pas encore de compte ? <a href="#formulaire-inscription" class="signup-link" onclick="showSignup()">S'inscrire</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Formulaire d'inscription -->
+    <section id="formulaire-inscription" class="form-section">
+        <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+        <h2>📄 Enregistrement</h2>
+        <form action="action.php" method="get" name="f1">
+            <label for="fname">Prénom:</label><br>
+            <input type="text" id="fname" name="fname"><br><br>
+            <label for="lname">Nom de famille:</label><br>
+            <input type="text" id="lname" name="lname"><br><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email"><br><br>
+            <label for="password">Mot de passe:</label><br>
+            <input type="password" id="password" name="password"><br><br>
+            <label for="age">Date de naissance :</label><br/>
+            <input type="date" id="age" name="date"><br /><br />
+            <label>Sexe</label><br>
+            <input type="radio" id="femme" value="femme" name="gender">
+            <label for="femme">Femme</label><br>
+            <input type="radio" id="homme" value="homme" name="gender">
+            <label for="homme">Homme</label>
+            <input type="submit" value="S'inscrire🎉">
+        </form>
+    </section>
+
+    <main>
+        <div class="into_box">
+            <p>Mon Analyseur de Couleurs est un outil web interactif qui génère des palettes personnalisées
+                à partir de votre couleur dominante. Découvrez instantanément quelles couleurs s'harmonisent
+                parfaitement avec vous pour vos tenues, votre décoration ou vos projets créatifs.
+            </p>
+        </div>
+
+        <!-- Section Testeur (Étape 1) -->
+        <section id="color-selector" class="color-selector">
+            <h2>🎯 Étape 1 : Choisissez votre couleur dominante</h2>
+            <div class="selector_option">
+                <div class="option">
+                    <h3>Sélecteur de couleur</h3>
+                    <div class="coleure_de_base_de_peau">
+                        <label for="colorPicker">Choisissez une couleur :</label>
+                        <input type="color" id="colorPicker" value="#d2b48c">
+                        <div id="selectedColorDisplay" class="color-display"></div>
+                    </div>
+                    <div class="option-teinte">
+                        <h3>👤 Teintes de peau prédéfinies</h3>
+                        <div class="skin-tones">
+                            <label for="choisir_Teintes_de_peau">Votre Teintes de peau prédéfinies :</label><br>
+                            <select name="couleur_peau" id="skinToneSelect">
+                                <option value="très_clair">Très clair</option>
+                                <option value="clair" selected="selected">Clair</option>
+                                <option value="moyen">Moyen</option>
+                                <option value="foncé">Foncé</option>
+                                <option value="très_foncé">Très foncé</option>
+                            </select><br><br> 
+                        </div>
+                    </div>
+                    <div class="option">
+                        <h3>✏️ Entrée manuelle</h3>
+                        <div class="manual-input">
+                            <label for="colorInput">Entrez un code couleur (hex) :</label>
+                            <div class="input-group">
+                                <input type="text" id="colorInput" placeholder="#FF6B6B" value="#d2b48c">
+                                <button class="btn-validate" onclick="validateColorInput()">Valider</button>
+                            </div>
+                            <p class="input-hint">Format : #RRGGBB (ex: #FF0000 pour rouge)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="generate-container">
+                <button class="btn-generate" onclick="generatePalette()">🎨 Générer ma palette personnelle</button>
+            </div>
+        </section>
+
+        <!-- Résultats -->
+        <section id="resultsSection" class="results" style="display: none;">
+            <h2>✨ Votre palette personnelle</h2>
+            <div class="results-header">
+                <div class="base-color-info">
+                    <h3>Votre couleur de base :</h3>
+                    <div id="baseColorDisplay" class="color-box-large"></div>
+                    <p id="baseColorText" class="color-code"></p>
+                </div>
+                <div class="analysis-result">
+                    <h3>📊 Analyse :</h3>
+                    <p id="colorAnalysisText">Analyse en cours...</p>
+                    <div id="colorTips" class="tips"></div>
+                </div>
+            </div>
+            
+            <!-- Palette générée -->
+            <div class="palette-container">
+                <h3>🎨 Votre palette harmonieuse :</h3>
+                <div id="paletteDisplay" class="palette-grid"></div>
+                <p class="palette-instruction">Cliquez sur une couleur pour la copier !</p>
+            </div>
+            
+            <!-- Conseils d'utilisation -->
+            <div class="usage-tips">
+                <h3>💡 Conseils d'utilisation :</h3>
+                <div id="usageTips" class="tips-grid"></div>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div class="action-buttons">
+                <button class="btn-action" onclick="savePalette()">💾 Sauvegarder cette palette</button>
+                <button class="btn-action" onclick="resetPalette()">🔄 Générer une nouvelle palette</button>
+                <button class="btn-action" onclick="exportPalette()">📤 Exporter la palette</button>
+            </div>
+        </section>
+
+        <!-- Section Vidéo -->
+        <section class="video_section">
+            <h2>🔍🎬 Comprendre la théorie des couleurs</h2>
+            <div class="video-container">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/9vh_ZBWY2Qk?si=bgUDjukdRtAfXINo" title="YouTube video player" 
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> 
+            </div>
+        </section>
+
+        <!-- Témoignages -->
+        <section class="testimonials">
+            <h2>👥 Ce que disent nos utilisateurs</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <div class="testimonial-header">
+                        <div class="avatar" style="background-color: #f8d8b7">S</div>
+                        <div>
+                            <h4>Sarah M.</h4>
+                            <p>Étudiante en design</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">
+                        "Cet outil m'a aidé à choisir les couleurs parfaites pour mon portfolio. 
+                        Les palettes générées sont toujours harmonieuses !"
+                    </p>
+                </div>
+                
+                <div class="testimonial">
+                    <div class="testimonial-header">
+                        <div class="avatar" style="background-color: #d2b48c">M</div>
+                        <div>
+                            <h4>Mohamed K.</h4>
+                            <p>Développeur web</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">
+                        "Je l'utilise pour créer des interfaces utilisateur cohérentes. 
+                        Un gain de temps énorme pour mes projets !"
+                    </p>
+                </div>
+                
+                <div class="testimonial">
+                    <div class="testimonial-header">
+                        <div class="avatar" style="background-color: #8d5524">L</div>
+                        <div>
+                            <h4>Lina T.</h4>
+                            <p>Fashion blogger</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">
+                        "Enfin un outil qui m'aide à choisir mes tenues selon ma couleur de peau. 
+                        Les résultats sont impressionnants !"
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer avec Contact -->
+    <footer id="contact-footer">
+        <div class="container_footer-content">
+            <div class="footer-section">
+                <h3>🎨 Mon Analyseur de Couleurs</h3>
+                <p>Projet étudiant - Module Développement Web</p>
+                <p>ENISo - Année universitaire 2025/2026</p>
+                <p>Filière : IA1</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>📞 Contact</h3>
+                <p>Responsable : Ela Alla Fejji & Sondes Ben Nejma</p>
+                <p>Email : contact@eniso.tn</p>
+                <p>Téléphone : +216 XX XXX XXX</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>🔗 Liens utiles</h3>
+                <a href="guide.html">Guide des couleurs</a>
+                <a href="#color-selector" class="scroll-link">Testeur virtuel</a>
+                <a href="#contact-footer" class="scroll-link">Formulaire de contact</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>⚙️ Technologies</h3>
+                <div class="tech-badges">
+                    <span class="badge">HTML5</span>
+                    <span class="badge">CSS3</span>
+                    <span class="badge">JavaScript</span>
+                    <span class="badge">Responsive</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 - Projet Développement Web - ENISo - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="script_dev.js"></script>
+</body>
+</html>
