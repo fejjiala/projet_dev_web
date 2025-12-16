@@ -6,36 +6,6 @@
     <title>VIBRANT</title>
     <meta name="description" content="Générateur de palettes de couleurs personnalisées à partir de votre couleur dominante. Projet étudiant ENISo">
     <link rel="stylesheet" href="style_dev.css">
-    <!--<style>
-        /* Animation de surbrillance pour les sections cibles */
-        @keyframes pulseHighlight {
-            0% {
-                box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 15px rgba(78, 205, 196, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(78, 205, 196, 0);
-            }
-        }
-        
-        .highlighted {
-            position: relative;
-            animation: pulseHighlight 1.5s ease-in-out;
-        }
-        
-        /* Style pour les liens de défilement */
-        .scroll-link {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .scroll-link:hover {
-            color: var(--primary, #4ECDC4);
-            transform: translateY(-2px);
-        }
-    </style>-->
 </head>
 <body>
     <header>
@@ -50,8 +20,8 @@
                 </div>
             </div>
             <nav class="menu">
-                <a href="index.html" class="active">🏠 Accueil</a>
-                <a href="guide.html">📚 Guide</a>
+                <a href="#introduction" class="active">🏠 Accueil</a>
+                <a href="#guide">📚 Guide</a>
                 <a href="#color-selector" class="scroll-link">👔 Testeur</a>
                 <a href="#contact-footer" class="scroll-link">📞 Contact</a>
                 <button class="btn-signin" onclick="openLoginModal()">🔐 Sign In</button>
@@ -81,46 +51,174 @@
             </form>
             
             <p class="modal-footer">
-                Pas encore de compte ? <a href="#formulaire-inscription" class="signup-link" onclick="showSignup()">S'inscrire</a>
+                Pas encore de compte ? <a href="#" class="signup-link" onclick="showSignupForm()">S'inscrire</a>
             </p>
         </div>
     </div>
 
-    <!-- Formulaire d'inscription -->
-    <section id="formulaire-inscription" class="form-section">
-        <span class="close-modal" onclick="closeLoginModal()">&times;</span>
-        <h2>📄 Enregistrement</h2>
-        <form action="action.php" method="get" name="f1">
-            <label for="fname">Prénom:</label><br>
-            <input type="text" id="fname" name="fname"><br><br>
-            <label for="lname">Nom de famille:</label><br>
-            <input type="text" id="lname" name="lname"><br><br>
-            <label for="email">Email:</label><br>
-            <input type="email" id="email" name="email"><br><br>
-            <label for="password">Mot de passe:</label><br>
-            <input type="password" id="password" name="password"><br><br>
-            <label for="age">Date de naissance :</label><br/>
-            <input type="date" id="age" name="date"><br /><br />
-            <label>Sexe</label><br>
-            <input type="radio" id="femme" value="femme" name="gender">
-            <label for="femme">Femme</label><br>
-            <input type="radio" id="homme" value="homme" name="gender">
-            <label for="homme">Homme</label>
-            <input type="submit" value="S'inscrire🎉">
+    <!-- Modal pour images agrandies -->
+    <div id="imageModal" class="modal-image">
+        <span class="close-modal" onclick="closeImageModal()">&times;</span>
+        <img class="modal-image-content" id="modalImage">
+        <div id="caption" class="modal-caption"></div>
+    </div>
+
+    <!-- Formulaire d'inscription (caché par défaut) -->
+    <section id="formulaire-inscription" class="form-section" style="display: none;">
+        <span class="close-modal" onclick="closeSignupForm()">&times;</span>
+        <h2>📄 Créer un compte</h2>
+        <form id="signupForm" onsubmit="return handleSignup(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fname">Prénom:</label>
+                    <input type="text" id="fname" name="fname" required>
+                </div>
+                <div class="form-group">
+                    <label for="lname">Nom de famille:</label>
+                    <input type="text" id="lname" name="lname" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe:</label>
+                <input type="password" id="password" name="password" required minlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label for="age">Date de naissance :</label>
+                <input type="date" id="age" name="date" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Sexe :</label>
+                <div class="gender-options">
+                    <div>
+                        <input type="radio" id="femme" value="femme" name="gender" required>
+                        <label for="femme">Femme</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="homme" value="homme" name="gender" required>
+                        <label for="homme">Homme</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" value="S'inscrire " class="btn-submit">S'inscrire 🎉</button>
+               <!--<input type="submit" value="S'inscrire 🎉" class="btn-submit">-->
+            </div>
+            
+            <p class="form-footer">
+                Déjà un compte ? <a href="#" onclick="showLogin()">Se connecter</a>
+            </p>
         </form>
     </section>
 
     <main>
-        <div class="into_box">
+        <div id="introduction" class="into_box">
             <p>Mon Analyseur de Couleurs est un outil web interactif qui génère des palettes personnalisées
                 à partir de votre couleur dominante. Découvrez instantanément quelles couleurs s'harmonisent
                 parfaitement avec vous pour vos tenues, votre décoration ou vos projets créatifs.
             </p>
         </div>
+        <section>
+            <h2>🎯 Types de Harmonie Colorimétrique</h2>
+            <ul>
+                <li>Harmonie Monochromatique</li>
+                <li>Harmonie Analogique</li>
+                <li>Harmonie Complémentaire</li>
+                <li>Harmonie Triadique</li>
+                <li>Harmonie Tétradique</li>
+            </ul>
+        </section>
+
+        <!-- Tableau -->
+        <section>
+            <h2>📊 Tableau des Correspondances de Couleurs</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Couleur</th>
+                        <th>Signification</th>
+                        <th>Utilisations Recommandées</th>
+                        <th>Teintes Complémentaires</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="background-color: #4ECDC4; color: white;">Bleu Turquoise</td>
+                        <td>Calme, Fraîcheur</td>
+                        <td>Décoration, Vêtements décontractés</td>
+                        <td>Orange, Rose</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #FF6B6B; color: white;">Rouge Corail</td>
+                        <td>Énergie, Passion</td>
+                        <td>Accents, Accessoires</td>
+                        <td>Vert, Bleu</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #FFD166; color: black;">Jaune Moutarde</td>
+                        <td>Joie, Optimisme</td>
+                        <td>Éléments décoratifs</td>
+                        <td>Violet, Bleu marine</td>
+                    </tr>
+                    <tr>
+                        <td style="background-color: #06D6A0; color: white;">Vert Émeraude</td>
+                        <td>Nature, Équilibre</td>
+                        <td>Tenues formelles</td>
+                        <td>Rose, Marron</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- Section Images Cliquables -->
+        <section>
+            <h2>🖼️ Exemples de Palettes (Cliquez pour agrandir)</h2>
+            <div class="clickable-images">
+                <div class="image-container">
+                    <img src="palette1.jpg" alt="Palette printanière" 
+                         onclick="openImageModal(this.src, 'Palette Printanière')"
+                         onmouseover="this.parentElement.style.transform='scale(1.05)'"
+                         onmouseout="this.parentElement.style.transform='scale(1)'">
+                    <div class="click-badge">
+                        <span>🔍</span> Cliquez pour agrandir
+                    </div>
+                    <p>Palette Printanière - Harmonie de couleurs douces et naturelles</p>
+                </div>
+                <div class="image-container">
+                    <img src="palette2.jpg" alt="Palette automnale" 
+                         onclick="openImageModal(this.src, 'Palette Automnale')"
+                         onmouseover="this.parentElement.style.transform='scale(1.05)'"
+                         onmouseout="this.parentElement.style.transform='scale(1)'">
+                    <div class="click-badge">
+                        <span>🔍</span> Cliquez pour agrandir
+                    </div>
+                    <p>Palette Automnale - Tons chauds et riches pour l'automne</p>
+                </div>
+            </div>
+        </section>
+         <!-- Liste ordonnée -->
+        <section id="guide">
+            <h2>📝 Étapes pour Choisir Sa Palette</h2>
+            <ol>
+                <li>Identifier sa couleur dominante</li>
+                <li>Déterminer son teint de peau</li>
+                <li>Choisir le type d'harmonie</li>
+                <li>Générer la palette</li>
+                <li>Tester avec des échantillons</li>
+            </ol>
+        </section>
 
         <!-- Section Testeur (Étape 1) -->
         <section id="color-selector" class="color-selector">
-            <h2>🎯 Étape 1 : Choisissez votre couleur dominante</h2>
+            <h2>🎯 Choisissez votre couleur dominante</h2>
             <div class="selector_option">
                 <div class="option">
                     <h3>Sélecteur de couleur</h3>
@@ -254,6 +352,15 @@
                 </div>
             </div>
         </section>
+        
+        <section>
+            <h2>🔗 Ressources Externes</h2>
+            <ul>
+                <li><a href="https://color.adobe.com/fr/" target="_blank">Adobe Color - Outil de palette</a></li>
+                <li><a href="https://coolors.co/" target="_blank">Coolors - Générateur de palettes</a></li>
+                <li><a href="https://www.canva.com/colors/color-wheel/" target="_blank">Canva - Roue chromatique</a></li>
+            </ul>
+        </section>
     </main>
 
     <!-- Footer avec Contact -->
@@ -275,9 +382,9 @@
             
             <div class="footer-section">
                 <h3>🔗 Liens utiles</h3>
-                <a href="guide.html">Guide des couleurs</a>
+                <a href="#guide">Guide des couleurs</a>
                 <a href="#color-selector" class="scroll-link">Testeur virtuel</a>
-                <a href="#contact-footer" class="scroll-link">Formulaire de contact</a>
+                <a href="#" onclick="showSignupForm()" class="signup-link">Formulaire d'inscription</a>
             </div>
             
             <div class="footer-section">

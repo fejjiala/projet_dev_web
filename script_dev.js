@@ -4,7 +4,6 @@ function openLoginModal() {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
     
-    // Animation d'entrée
     setTimeout(() => {
         modal.style.opacity = '1';
     }, 10);
@@ -20,22 +19,108 @@ function closeLoginModal() {
     }, 300);
 }
 
-// Fermer la modal en cliquant en dehors
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('loginModal');
-    if (event.target === modal) {
-        closeLoginModal();
+// ===== FONCTIONS POUR LA MODAL D'IMAGES =====
+function openImageModal(src, caption) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const captionText = document.getElementById('caption');
+    
+    if (modal && modalImg && captionText) {
+        modal.innerHTML = `
+            <span class="close-modal" onclick="closeImageModal()">&times;</span>
+            <div class="loading-indicator">
+                <span>⏳</span> Chargement de l'image...
+            </div>
+        `;
+        modal.style.display = 'block';
+        modal.style.opacity = '0';
+        
+        setTimeout(() => {
+            modal.style.opacity = '1';
+        }, 10);
+        
+        const img = new Image();
+        img.onload = function() {
+            modal.innerHTML = `
+                <span class="close-modal" onclick="closeImageModal()">&times;</span>
+                <img class="modal-image-content" id="modalImage" src="${src}" alt="${caption}">
+                <div id="caption" class="modal-caption">${caption}</div>
+            `;
+        };
+        
+        img.onerror = function() {
+            modal.innerHTML = `
+                <span class="close-modal" onclick="closeImageModal()">&times;</span>
+                <div class="loading-indicator" style="color: #FF6B6B;">
+                    <span>❌</span> Impossible de charger l'image
+                </div>
+            `;
+        };
+        
+        img.src = src;
+        document.body.style.overflow = 'hidden';
+        showNotification(`Image "${caption}" agrandie`, 'info');
     }
+}
 
-
-});
-
-// Fermer avec la touche Échap
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-        closeLoginModal();
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
     }
-});
+}
+
+// ===== FONCTIONS POUR LE FORMULAIRE D'INSCRIPTION =====
+function showSignupForm() {
+    closeLoginModal();
+    
+    setTimeout(() => {
+        const signupSection = document.getElementById('formulaire-inscription');
+        if (signupSection) {
+            signupSection.style.display = 'block';
+            
+            setTimeout(() => {
+                signupSection.style.opacity = '1';
+                signupSection.style.transform = 'translateY(0)';
+            }, 10);
+            
+            const header = document.querySelector('header');
+            const headerHeight = header ? header.offsetHeight : 0;
+            const targetPosition = signupSection.offsetTop - headerHeight - 20;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+            
+            showNotification('Formulaire d\'inscription ouvert', 'info');
+        }
+    }, 300);
+}
+
+function closeSignupForm() {
+    const signupSection = document.getElementById('formulaire-inscription');
+    if (signupSection) {
+        signupSection.style.opacity = '0';
+        signupSection.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            signupSection.style.display = 'none';
+        }, 300);
+    }
+}
+
+function showLogin() {
+    closeSignupForm();
+    
+    setTimeout(() => {
+        openLoginModal();
+    }, 300);
+}
 
 // ===== FORMULAIRE DE CONNEXION =====
 function handleLogin(event) {
@@ -49,7 +134,6 @@ function handleLogin(event) {
         return false;
     }
     
-    // Simulation de connexion
     const submitBtn = event.target.querySelector('.btn-submit');
     submitBtn.classList.add('loading');
     submitBtn.innerHTML = '<span>Connexion...</span>';
@@ -66,45 +150,52 @@ function handleLogin(event) {
     return false;
 }
 
-// ===== FUNCTION SHOWSIGNUP =====
-function showSignup() {
-    closeLoginModal();
+function handleSignup(event) {
+    event.preventDefault();
+    
+    const firstName = document.getElementById('fname').value;
+    const lastName = document.getElementById('lname').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const birthDate = document.getElementById('age').value;
+    const gender = document.querySelector('input[name="gender"]:checked');
+    
+    if (!firstName || !lastName || !email || !password || !birthDate || !gender) {
+        showNotification('Veuillez remplir tous les champs', 'error');
+        return false;
+    }
+    
+    if (password.length < 6) {
+        showNotification('Le mot de passe doit contenir au moins 6 caractères', 'error');
+        return false;
+    }
+    
+    const submitBtn = event.target.querySelector('.btn-submit');
+    const originalText = submitBtn.value;
+    submitBtn.disabled = true;
+    submitBtn.value = 'Inscription en cours...';
     
     setTimeout(() => {
-        const formSection = document.getElementById('formulaire-inscription');
-        if (formSection) {
-            // Calculer l'offset pour le header fixe
-            const header = document.querySelector('header');
-            const headerHeight = header ? header.offsetHeight : 0;
-            const targetPosition = formSection.offsetTop - headerHeight - 20;
-            
-            // Défilement fluide
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
-            
-            // Mise en surbrillance
-            formSection.style.animation = 'none';
-            setTimeout(() => {
-                formSection.style.animation = 'pulseHighlight 2s ease-in-out';
-            }, 10);
-            
-            // Ajout de la classe pour le style de surbrillance
-            formSection.classList.add('highlighted');
-            setTimeout(() => {
-                formSection.classList.remove('highlighted');
-            }, 2000);
-        }
-    }, 300);
+        submitBtn.disabled = false;
+        submitBtn.value = originalText;
+        
+        showNotification('Inscription réussie ! Bienvenue ' + firstName + ' !', 'success');
+        closeSignupForm();
+        
+        document.getElementById('signupForm').reset();
+        
+        setTimeout(() => {
+            openLoginModal();
+        }, 1500);
+    }, 2000);
+    
+    return false;
 }
 
 // ===== GESTION DES COULEURS =====
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialiser l'affichage de couleur
     updateColorDisplay();
     
-    // Écouteurs d'événements
     const colorPicker = document.getElementById('colorPicker');
     if (colorPicker) {
         colorPicker.addEventListener('input', updateColorDisplay);
@@ -119,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initialiser la navigation par défilement
     setupScrollNavigation();
 });
 
@@ -132,29 +222,26 @@ function updateColorDisplay() {
         colorDisplay.style.backgroundColor = color;
         colorDisplay.style.boxShadow = `0 8px 20px ${color}80`;
         
-        // Mettre à jour le champ texte
         document.getElementById('colorInput').value = color.toUpperCase();
     }
 }
 
 function validateColorInput() {
     const colorInput = document.getElementById('colorInput');
-    const color = colorInput.value;
+    const color = colorInput.value.trim();
     
     if (isValidHexColor(color)) {
-        // Mettre à jour le sélecteur de couleur
         document.getElementById('colorPicker').value = color;
         updateColorDisplay();
         
         showNotification('Couleur valide !', 'success');
         
-        // Animation de validation
         colorInput.style.borderColor = '#4ECDC4';
         setTimeout(() => {
             colorInput.style.borderColor = '';
         }, 2000);
     } else {
-        showNotification('Format invalide. Utilisez #RRGGBB', 'error');
+        showNotification('Format invalide. Utilisez #RRGGBB (ex: #FF0000)', 'error');
         colorInput.style.borderColor = '#FF6B6B';
         setTimeout(() => {
             colorInput.style.borderColor = '';
@@ -169,44 +256,41 @@ function isValidHexColor(color) {
 // ===== GÉNÉRATION DE PALETTE =====
 function generatePalette() {
     const baseColor = document.getElementById('colorPicker').value;
-    const skinTone = document.querySelector('select[name="couleur_peau"]').value;
+    const skinTone = document.getElementById('skinToneSelect').value;
     
-    // Afficher la section des résultats
     const resultsSection = document.getElementById('resultsSection');
     resultsSection.style.display = 'block';
-    
-    // Animation d'apparition
     resultsSection.style.animation = 'fadeInUp 0.8s ease-out';
     
-    // Mettre à jour la couleur de base
-    document.getElementById('baseColorDisplay').style.backgroundColor = baseColor;
-    document.getElementById('baseColorText').textContent = baseColor.toUpperCase();
+    const baseColorDisplay = document.getElementById('baseColorDisplay');
+    const baseColorText = document.getElementById('baseColorText');
     
-    // Générer une palette harmonieuse
+    if (baseColorDisplay) {
+        baseColorDisplay.style.backgroundColor = baseColor;
+        baseColorDisplay.style.boxShadow = `0 8px 20px ${baseColor}80`;
+        baseColorDisplay.innerHTML = `<span class="color-code">${baseColor.toUpperCase()}</span>`;
+    }
+    
+    if (baseColorText) {
+        baseColorText.textContent = baseColor.toUpperCase();
+    }
+    
     const palette = generateHarmoniousColors(baseColor, skinTone);
     displayPalette(palette);
-    
-    // Générer l'analyse
     generateColorAnalysis(baseColor, skinTone);
-    
-    // AFFICHER LES CONSEILS D'UTILISATION
     displayUsageTips(palette);
     
-    // Scroller vers les résultats
     resultsSection.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
     });
     
-    // Notification
     showNotification('Palette générée avec succès !', 'success');
 }
 
 function generateHarmoniousColors(baseColor, skinTone) {
-    // Convertir hex en RGB
     const rgb = hexToRgb(baseColor);
     
-    // Ajustements selon la teinte de peau
     const adjustments = {
         'très_clair': { r: 20, g: 20, b: 20 },
         'clair': { r: 10, g: 10, b: 10 },
@@ -217,24 +301,24 @@ function generateHarmoniousColors(baseColor, skinTone) {
     
     const adj = adjustments[skinTone] || { r: 0, g: 0, b: 0 };
     
-    // Générer une palette harmonieuse
-    return [
+    const colors = [
         baseColor,
         lightenColor(rgb, 30 + adj.r),
         darkenColor(rgb, 30 + adj.r),
         complementColor(rgb),
         analogousColor(rgb, 30),
-        triadicColor(rgb, 120)
+        analogousColor(rgb, -30)
     ];
+    
+    return colors;
 }
 
 function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return { r, g, b };
 }
 
 function rgbToHex(r, g, b) {
@@ -260,20 +344,71 @@ function complementColor(rgb) {
 }
 
 function analogousColor(rgb, degree = 30) {
-    // Simuler un décalage de teinte
-    return rgbToHex(
-        (rgb.r + degree) % 256,
-        (rgb.g + degree) % 256,
-        (rgb.b + degree) % 256
-    );
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+    hsl.h = (hsl.h + degree) % 360;
+    const newRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+    return rgbToHex(newRgb.r, newRgb.g, newRgb.b);
 }
 
-function triadicColor(rgb, degree = 120) {
-    return rgbToHex(
-        (rgb.r + degree) % 256,
-        (rgb.g + degree) % 256,
-        (rgb.b + degree) % 256
-    );
+function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    
+    if (max === min) {
+        h = s = 0;
+    } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        
+        switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        
+        h /= 6;
+    }
+    
+    return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+function hslToRgb(h, s, l) {
+    h /= 360;
+    s /= 100;
+    l /= 100;
+    
+    let r, g, b;
+    
+    if (s === 0) {
+        r = g = b = l;
+    } else {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        };
+        
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+    }
+    
+    return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255)
+    };
 }
 
 function displayPalette(colors) {
@@ -284,19 +419,15 @@ function displayPalette(colors) {
         const colorBox = document.createElement('div');
         colorBox.className = 'color-box';
         colorBox.style.backgroundColor = color;
-        colorBox.style.background = `linear-gradient(135deg, ${color}, ${lightenColor(hexToRgb(color), 20)})`;
         colorBox.style.boxShadow = `0 8px 20px ${color}80`;
         colorBox.setAttribute('data-color', color);
         colorBox.setAttribute('title', `Cliquer pour copier: ${color}`);
         
-        // Ajouter le code couleur
         const colorCode = document.createElement('span');
         colorCode.className = 'color-code';
         colorCode.textContent = color;
-        colorCode.style.color = getContrastColor(color);
         colorBox.appendChild(colorCode);
         
-        // Événement de clic pour copier
         colorBox.addEventListener('click', function() {
             copyToClipboard(color);
             this.style.transform = 'scale(0.95)';
@@ -309,18 +440,11 @@ function displayPalette(colors) {
     });
 }
 
-function getContrastColor(hexColor) {
-    const rgb = hexToRgb(hexColor);
-    const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-    return luminance > 0.5 ? '#000000' : '#FFFFFF';
-}
-
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         showNotification(`Couleur ${text} copiée !`, 'success');
     }).catch(err => {
         console.error('Erreur:', err);
-        // Fallback pour anciens navigateurs
         const textArea = document.createElement('textarea');
         textArea.value = text;
         document.body.appendChild(textArea);
@@ -343,9 +467,10 @@ function generateColorAnalysis(color, skinTone) {
         'très_foncé': 'Contraste élégant et sophistiqué pour les teints très foncés.'
     };
     
-    analysisText.textContent = analyses[skinTone] || 'Couleur bien choisie !';
+    if (analysisText) {
+        analysisText.textContent = analyses[skinTone] || 'Couleur bien choisie !';
+    }
     
-    // Conseils dynamiques
     const tipsList = [
         '💡 Idéal pour les tenues de jour comme de soirée',
         '👔 Parfait avec des accessoires en or ou en cuivre',
@@ -353,61 +478,53 @@ function generateColorAnalysis(color, skinTone) {
         '✨ Ajoutez une touche de noir pour plus de sophistication'
     ];
     
-    tips.innerHTML = tipsList.map(tip => `<p>${tip}</p>`).join('');
+    if (tips) {
+        tips.innerHTML = tipsList.map(tip => `<p>${tip}</p>`).join('');
+    }
 }
 
-// ===== FONCTION POUR AFFICHER LES CONSEILS D'UTILISATION =====
 function displayUsageTips(palette) {
     const usageTips = document.getElementById('usageTips');
     
-    if (!usageTips) {
-        console.error("L'élément usageTips n'a pas été trouvé dans le DOM");
-        return;
-    }
+    if (!usageTips) return;
     
-    // Créer le contenu HTML des conseils
     const tipsHTML = `
-        <div class="tips-content">
-            <div class="tip-item">
-                <h4><strong>👕 Pour vos vêtements</strong></h4>
-                <p>Utilisez la couleur de base pour un haut (chemise, t-shirt) et les couleurs 1 et 2 pour le bas (pantalon, jupe). La couleur 3 peut servir pour les accessoires.</p>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h4>👕 Vêtements</h4>
+                <p>Utilisez la couleur principale pour un haut et les tons secondaires pour le bas et les accessoires.</p>
             </div>
-            
-            <div class="tip-item">
-                <h4><strong>🏠 Pour votre déco</strong></h4>
-                <p>Peignez un mur avec la couleur de base. Utilisez la couleur 1 pour les meubles et la couleur 2 pour les textiles (rideaux, coussins).</p>
+            <div class="tip-card">
+                <h4>🏠 Décoration</h4>
+                <p>La couleur principale pour les murs, les tons clairs pour les meubles et les tons foncés pour les accents.</p>
             </div>
-            
-            <div class="tip-item">
-                <h4><strong>🎨 Pour vos designs</strong></h4>
-                <p>Utilisez la couleur de base pour l'arrière-plan. La couleur 1 pour le texte principal et la couleur 2 pour les boutons et liens.</p>
+            <div class="tip-card">
+                <h4>🎨 Design</h4>
+                <p>Utilisez la palette pour créer des interfaces harmonieuses et attractives.</p>
             </div>
-            
-            <div class="tip-item">
-                <h4><strong>📱 Pour vos interfaces</strong></h4>
-                <p>La couleur de base pour le header, la couleur 1 pour les boutons d'action, la couleur 2 pour les bordures et séparateurs.</p>
+            <div class="tip-card">
+                <h4>💼 Professionnel</h4>
+                <p>Idéal pour des présentations et documents qui attirent l'attention de manière subtile.</p>
             </div>
         </div>
     `;
     
-    // Injecter le HTML dans l'élément
     usageTips.innerHTML = tipsHTML;
-    
-    // Ajouter des styles si nécessaire
-    addUsageTipsStyles();
 }
 
 // ===== FONCTIONS D'ACTION =====
 function savePalette() {
     showNotification('Palette sauvegardée dans vos favoris !', 'success');
-    // Ici vous pourriez ajouter du code pour sauvegarder dans localStorage
+    localStorage.setItem('vibrant_last_palette', JSON.stringify({
+        colors: Array.from(document.querySelectorAll('.color-box')).map(box => box.getAttribute('data-color')),
+        date: new Date().toISOString()
+    }));
 }
 
 function resetPalette() {
     document.getElementById('resultsSection').style.display = 'none';
     document.getElementById('colorPicker').value = '#d2b48c';
     updateColorDisplay();
-    
     showNotification('Nouvelle palette prête !', 'info');
 }
 
@@ -445,49 +562,36 @@ function setupScrollNavigation() {
             
             const targetId = this.getAttribute('href');
             
-            if (targetId.startsWith('#')) {
+            if (targetId && targetId.startsWith('#')) {
                 const targetElement = document.querySelector(targetId);
                 
                 if (targetElement) {
-                    // Calculer la position avec offset pour le header fixe
                     const header = document.querySelector('header');
                     const headerHeight = header ? header.offsetHeight : 0;
                     
                     let targetPosition;
                     
-                    // Cas spécial pour le footer
                     if (targetId === '#contact-footer') {
                         targetPosition = document.body.scrollHeight - window.innerHeight;
                     } else {
                         targetPosition = targetElement.offsetTop - headerHeight - 20;
                     }
                     
-                    // Défilement fluide
                     window.scrollTo({
                         top: targetPosition,
                         behavior: 'smooth'
                     });
-                    
-                    // Mettre en surbrillance la section cible
-                    highlightTargetSection(targetElement);
                 }
             }
         });
     });
 }
 
-function highlightTargetSection(element) {
-    // Ajouter une classe de surbrillance
-    element.classList.add('highlighted');
-    
-    // Retirer la classe après l'animation
-    setTimeout(() => {
-        element.classList.remove('highlighted');
-    }, 1500);
-}
-
 // ===== NOTIFICATIONS =====
 function showNotification(message, type = 'info') {
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -499,19 +603,17 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Animation d'entrée
     setTimeout(() => {
         notification.style.opacity = '1';
         notification.style.transform = 'translateY(0)';
     }, 10);
     
-    // Supprimer après 3 secondes
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateY(-20px)';
         setTimeout(() => {
             if (notification.parentNode) {
-                document.body.removeChild(notification);
+                notification.remove();
             }
         }, 300);
     }, 3000);
@@ -527,91 +629,30 @@ function getNotificationIcon(type) {
     return icons[type] || 'ℹ️';
 }
 
-// ===== AJOUT DES STYLES POUR LES CONSEILS =====
-function addUsageTipsStyles() {
-    // Vérifier si les styles sont déjà présents
-    if (document.querySelector('#usage-tips-styles')) return;
+// ===== GESTION DES ÉVÉNEMENTS =====
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('loginModal');
+    if (event.target === modal) {
+        closeLoginModal();
+    }
     
-    const styleElement = document.createElement('style');
-    styleElement.id = 'usage-tips-styles';
-    styleElement.textContent = `
-        .tips-content {
-            margin-top: 1.5rem;
-        }
-        
-        .tip-item {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            border-left: 4px solid #4ECDC4;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        
-        .tip-item h4 {
-            color: #1A1A2E;
-            margin-bottom: 0.75rem;
-            font-size: 1.1rem;
-        }
-        
-        .tip-item p {
-            color: #6c757d;
-            line-height: 1.6;
-            margin: 0;
-        }
-        
-        /* Styles pour les notifications */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            z-index: 9999;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s ease;
-            max-width: 350px;
-            border-left: 4px solid;
-        }
-        
-        .notification-success {
-            border-left-color: #4ECDC4;
-        }
-        
-        .notification-error {
-            border-left-color: #FF6B6B;
-        }
-        
-        .notification-warning {
-            border-left-color: #FFE66D;
-        }
-        
-        .notification-info {
-            border-left-color: #45B7D1;
-        }
-        
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .notification-icon {
-            font-size: 1.2rem;
-        }
-        
-        .notification-message {
-            font-weight: 500;
-            color: #1A1A2E;
-        }
-    `;
-    
-    document.head.appendChild(styleElement);
-}
+    const imageModal = document.getElementById('imageModal');
+    if (imageModal && imageModal.style.display === 'block' && 
+        event.target === imageModal) {
+        closeImageModal();
+    }
+});
 
-// ===== STYLES INITIAUX =====
-// Ajouter les styles au chargement
-addUsageTipsStyles();
+document.addEventListener('keydown', function(e) {
+    const loginModal = document.getElementById('loginModal');
+    const imageModal = document.getElementById('imageModal');
+    
+    if (e.key === 'Escape') {
+        if (loginModal && loginModal.style.display === 'block') {
+            closeLoginModal();
+        }
+        if (imageModal && imageModal.style.display === 'block') {
+            closeImageModal();
+        }
+    }
+});
